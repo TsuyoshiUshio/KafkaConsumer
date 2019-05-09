@@ -9,9 +9,9 @@ using Microsoft.Extensions.Logging;
 
 namespace KafkaConsumer
 {
-    public static class Function1
+    public static class PaymentProcessor
     {
-        [FunctionName("Function1")]
+        [FunctionName("PaymentProcessor")]
         public static async Task Run([EventHubTrigger("payment", Connection = "ConnectionString")] EventData[] events, ILogger log)
         {
             var exceptions = new List<Exception>();
