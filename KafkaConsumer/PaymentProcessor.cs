@@ -8,13 +8,14 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using System.Threading;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace KafkaConsumer
 {
     public static class PaymentProcessor
     {
         [FunctionName("PaymentProcessor")]
-        public static async Task Run([EventHubTrigger("payment", Connection = "ConnectionString")] EventData[] events, ILogger log)
+        public static async Task Run([EventHubTrigger("payment", Connection = "ConnectionString")] EventData[] events, [EventHub("processedmessages", Connection = "ConnectionString")]IAsyncCollector<string> outputEvents, ILogger log)
         {
             var exceptions = new List<Exception>();
             Random timeRandom = new Random();
@@ -39,8 +40,10 @@ namespace KafkaConsumer
 
                     msgObj["timeProcessed"] = DateTime.UtcNow;
 
-                    log.LogInformation($"C# Event Hub trigger function processed a message: {JObject.FromObject(msgObj)}");
+                    log.LogInformation($"C# Event Hub trigger function processed a message: {JsonConvert.SerializeObject(msgObj)}");
 
+                    // then send the message
+                    await outputEvents.AddAsync(JsonConvert.SerializeObject(msgObj));
 
                     await Task.Yield();
 

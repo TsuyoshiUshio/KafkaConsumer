@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.EventHubs;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace KafkaConsumer
@@ -14,7 +15,7 @@ namespace KafkaConsumer
     public static class TicketRequestProcessor
     {
         [FunctionName("TicketRequestProcessor")]
-        public static async Task Run([EventHubTrigger("ticket_request", Connection = "ConnectionString")] EventData[] events, ILogger log)
+        public static async Task Run([EventHubTrigger("ticket_request", Connection = "ConnectionString")] EventData[] events, [EventHub("processedmessages", Connection = "ConnectionString")]IAsyncCollector<string> outputEvents, ILogger log)
         {
             var exceptions = new List<Exception>();
             Random timeRandom = new Random();
@@ -39,7 +40,10 @@ namespace KafkaConsumer
 
                     msgObj["timeProcessed"] = DateTime.UtcNow;
 
-                    log.LogInformation($"C# Event Hub trigger function processed a message: {JObject.FromObject(msgObj)}");
+                    log.LogInformation($"C# Event Hub trigger function processed a message: {JsonConvert.SerializeObject(msgObj)}");
+
+                    // then send the message
+                    await outputEvents.AddAsync(JsonConvert.SerializeObject(msgObj));
 
                     await Task.Yield();
                 }
