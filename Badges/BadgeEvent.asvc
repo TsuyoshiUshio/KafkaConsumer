@@ -1,5 +1,5 @@
 {
-    "namespace": "Badges"
+    "namespace":"badgeevent",
     "type":"record",
     "name":"BadgeEvent",
     "fields":
