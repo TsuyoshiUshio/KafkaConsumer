@@ -1,0 +1,16 @@
+{
+    "namespace": "Badges"
+    "type":"record",
+    "name":"BadgeEvent",
+    "fields":
+    [
+        {"name":"id", "type":"string"},
+        {"name":"name", "type":"string"},
+        {"name":"userId", "type":"string"},
+        {"name":"displayName", "type":"string"},
+        {"name":"reputation", "type":"string"},
+        {"name":"upVotes", "type":"int"},
+        {"name":"downVotes", "type":"int"},
+        {"name":"processedDate", "type":"string"}
+    ]
+}
