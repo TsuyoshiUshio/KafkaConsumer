@@ -1,0 +1,21 @@
+SELECT
+
+ DATEDIFF (mi , TicketRequestTime, TimeProcessed )-630 as TicketProcessingTime,
+
+ TicketID,
+
+ TicketRequestTime,
+
+ TimeProcessed,
+
+ TicketAvailable
+
+INTO
+
+ [powerbi-output]
+
+FROM
+
+ [ProcessMessageInput]
+
+WHERE PaymentType is NULL

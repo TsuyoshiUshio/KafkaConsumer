@@ -1,0 +1,47 @@
+WITH ticketCountPerMinute AS (
+
+SELECT
+
+ eventId,
+
+ count(ticketId) as ticketCount
+
+FROM
+
+ [processedmessageseh]
+
+TIMESTAMP BY ticketrequesttime
+
+GROUP BY eventId, ticketCount, SlidingWindow(minute, 2)), 
+ 
+
+detectionStep AS (
+
+SELECT 
+
+ eventId,
+
+ ticketCount,
+
+ AnomalyDetection_SpikeAndDip(ticketCount, 95, 120, 'spikesanddips')
+
+ OVER (LIMIT DURATION(second, 120)) AS spikeAndDipScore
+
+FROM [ticketCountPerMinute]
+
+)
+ 
+
+SELECT 
+
+ eventId,
+
+ ticketCount,
+
+ CAST(GetRecordPropertyValue(spikeANdDipScore, 'Score') as FLOAT) AS SpikeAndDipScore,
+
+ CAST(GetRecordPropertyValue(spikeAndDipScore, 'IsAnomaly') as bigint) AS IsSpikeAndDipAnomaly
+
+INTO [powerbioutput]
+
+FROM [detectionStep]

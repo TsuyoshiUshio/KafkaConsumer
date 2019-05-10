@@ -1,0 +1,8 @@
+SELECT
+ COUNT(*) as numofpayments,  System.Timestamp paymentvalidtime 
+INTO
+    powerbioutput
+FROM
+    messagesinput TIMESTAMP BY eventenqueuedUtcTime
+WHERE paymentValid = 1
+GROUP BY paymentValid, TumblingWindow(Duration(minute, 1))
