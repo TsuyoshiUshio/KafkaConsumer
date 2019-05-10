@@ -6,6 +6,7 @@ using Confluent.SchemaRegistry.Serdes;
 using Confluent.SchemaRegistry;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace badgeevent
@@ -17,12 +18,17 @@ namespace badgeevent
             //Console.WriteLine("Hello World!");
             var bootstrapServers = "40.76.55.228:31090";
             var schemaRegistryUrl = "13.90.136.100:8081";
-
-            await ProduceSpecific(bootstrapServers, schemaRegistryUrl);
+            for (int i = 0; i < 20; i++)
+            {
+                await ProduceSpecific(bootstrapServers, schemaRegistryUrl);
+                await Task.Delay(2000); 
+                Console.WriteLine("Made a record");
+            }
+            Console.ReadKey();
         }
 
         
-        async static Task ProduceSpecific(string bootstrapServers, string schemaRegistryUrl)
+        static async Task ProduceSpecific(string bootstrapServers, string schemaRegistryUrl)
         {
             using (var schemaRegistry = new CachedSchemaRegistryClient(new SchemaRegistryConfig { SchemaRegistryUrl = schemaRegistryUrl }))
             using (var producer =
@@ -42,7 +48,8 @@ namespace badgeevent
                             displayName ="dragonmantank",
                             reputation = "7636",
                             upVotes = 56,
-                            downVotes =  3
+                            downVotes =  3,
+                            processedDate = DateTime.UtcNow.ToString()
                         }
                         
                     });
